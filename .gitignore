@@ -1,0 +1,21 @@
+# Virtual Environment
+.venv/
+env/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+
+# Jupyter Checkpoints
+.ipynb_checkpoints/
+
+# ZIP submission archives
+*.zip
+
+# Local SQLite databases in pipeline root if not needed in git (optional, but keep folder)
+# pipeline_root/.temp/
