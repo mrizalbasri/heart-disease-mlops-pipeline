@@ -1,0 +1,55 @@
+{
+  "evalConfig": {
+    "modelSpecs": [
+      {
+        "labelKey": "target"
+      }
+    ],
+    "slicingSpecs": [
+      {},
+      {
+        "featureKeys": [
+          "sex"
+        ]
+      }
+    ],
+    "metricsSpecs": [
+      {
+        "metrics": [
+          {
+            "className": "AUC"
+          },
+          {
+            "className": "FalsePositives"
+          },
+          {
+            "className": "TruePositives"
+          },
+          {
+            "className": "FalseNegatives"
+          },
+          {
+            "className": "TrueNegatives"
+          },
+          {
+            "className": "BinaryAccuracy",
+            "threshold": {
+              "valueThreshold": {
+                "lowerBound": 0.5
+              }
+            }
+          }
+        ],
+        "modelNames": [
+          ""
+        ]
+      }
+    ]
+  },
+  "version": "0.45.0",
+  "dataLocation": "<user provided PCollection>",
+  "fileFormat": "<unknown>",
+  "modelLocations": {
+    "": "pipeline_root\\Trainer\\model\\17\\Format-Serving"
+  }
+}
