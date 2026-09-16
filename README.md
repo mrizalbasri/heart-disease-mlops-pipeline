@@ -1,187 +1,41 @@
-# Proyek Pengembangan Machine Learning Pipeline: Prediksi Risiko Penyakit Jantung (Heart Disease)
+# Submission 1: Machine Learning Pipeline - Heart Disease Prediction
 
-- **Nama:** M. Rizal Basri
-- **Username Dicoding:** rizalbasri
-- **Pipeline Name:** rizalbasri-pipeline
-- **Dataset:** UCI Heart Disease (Cleveland Dataset)
-- **Framework:** TensorFlow Extended (TFX) dengan InteractiveContext
+Nama: M. Rizal Basri  
+Username dicoding: rizalbasri  
 
----
-
-## 1. Informasi terkait Dataset yang Digunakan
-
-### Sumber dan Karakteristik Dataset
-Dataset yang digunakan dalam proyek ini adalah **Heart Disease Dataset** yang bersumber dari *UCI Machine Learning Repository (Cleveland Clinic Foundation)*. Dataset ini merupakan salah satu acuan standar dalam penelitian medis dan pembelajaran mesin untuk mendeteksi tanda-tanda awal risiko penyakit jantung.
-
-- **Jumlah Sampel (Observasi):** 303 data pasien
-- **Jumlah Atribut/Fitur:** 13 variabel fitur klinis (kombinasi data kontinu/numerik dan diskrit/kategorikal)
-- **Label Target:** 1 kolom diagnosis biner (`target`)
-- **Kondisi Kualitas Data:** Tidak terdapat *missing values* (nilai kosong), seluruh rentang nilai berada dalam domain klinis yang valid, dan distribusi label target terdistribusi secara seimbang ($\approx 54.5\%$ pasien berisiko dan $\approx 45.5\%$ pasien normal/sehat).
-
-### Deskripsi Seluruh Fitur dan Target
-
-| No | Nama Fitur | Tipe Data | Domain / Rentang | Keterangan Klinis |
-| :-: | :--- | :--- | :--- | :--- |
-| 1 | `age` | Numerik (Kontinu) | 29 – 77 tahun | Usia pasien dalam satuan tahun |
-| 2 | `sex` | Kategorikal (Diskrit) | 0, 1 | Jenis kelamin (0 = Perempuan; 1 = Laki-laki) |
-| 3 | `cp` | Kategorikal (Diskrit) | 0, 1, 2, 3 | Tipe nyeri dada (*Chest Pain Type*: 0 = typical angina, 1 = atypical angina, 2 = non-anginal pain, 3 = asymptomatic) |
-| 4 | `trestbps` | Numerik (Kontinu) | 94 – 200 mm Hg | Tekanan darah saat istirahat (*resting blood pressure*) |
-| 5 | `chol` | Numerik (Kontinu) | 126 – 564 mg/dl | Kadar kolesterol serum darah |
-| 6 | `fbs` | Kategorikal (Diskrit) | 0, 1 | Gula darah puasa > 120 mg/dl (1 = Benar; 0 = Salah) |
-| 7 | `restecg` | Kategorikal (Diskrit) | 0, 1, 2 | Hasil elektrokardiogram saat istirahat (0 = normal, 1 = memiliki gelombang ST-T abnormal, 2 = hipertrofi ventrikel kiri) |
-| 8 | `thalach` | Numerik (Kontinu) | 71 – 202 bpm | Detak jantung maksimum yang dicapai saat uji beban |
-| 9 | `exang` | Kategorikal (Diskrit) | 0, 1 | Angina yang diinduksi oleh aktivitas fisik/olahraga (1 = Ya; 0 = Tidak) |
-| 10 | `oldpeak` | Numerik (Kontinu) | 0.0 – 6.2 | Depresi segmen ST yang diinduksi oleh latihan relatif terhadap istirahat |
-| 11 | `slope` | Kategorikal (Diskrit) | 0, 1, 2 | Kemiringan puncak segmen ST saat latihan (0 = upsloping, 1 = flat, 2 = downsloping) |
-| 12 | `ca` | Kategorikal (Diskrit) | 0 – 4 | Jumlah pembuluh darah utama yang diwarnai oleh fluoroskopi |
-| 13 | `thal` | Kategorikal (Diskrit) | 0, 1, 2, 3 | Hasil tes Thalassemia (1 = normal, 2 = *fixed defect*, 3 = *reversible defect*) |
-| 14 | **`target`** | **Label Biner (Diskrit)** | **0, 1** | **Diagnosis penyakit jantung (1 = Memiliki risiko penyakit jantung; 0 = Normal / Bebas risiko)** |
+| | Deskripsi |
+| :--- | :--- |
+| **Dataset** | Dataset yang digunakan adalah **UCI Heart Disease Dataset (Cleveland Clinic Foundation)** yang diperoleh dari UCI Machine Learning Repository ([tautan dataset](https://archive.ics.uci.edu/dataset/45/heart+disease)). Dataset ini terdiri dari **303 sampel pasien** dengan **13 fitur klinis** dan **1 label target diagnosis biner** (`target`: 1 = terdapat risiko penyakit jantung, 0 = normal/bebas risiko). Seluruh data terdistribusi seimbang ($\\approx 54.5\\%$ positif dan $\\approx 45.5\\%$ negatif) serta tidak memiliki nilai kosong (*missing values*). Fitur-fitur mencakup variabel kontinu (`age`, `trestbps`, `chol`, `thalach`, `oldpeak`) dan kategorikal/diskrit (`sex`, `cp`, `fbs`, `restecg`, `exang`, `slope`, `ca`, `thal`). |
+| **Masalah** | Penyakit jantung merupakan salah satu penyebab mortalitas tertinggi di dunia. Diagnosis klinis konvensional seringkali memerlukan rangkaian prosedur medis yang memakan waktu, berbiaya tinggi, serta memiliki potensi variabilitas subjektif. Dalam perspektif Machine Learning Operations (MLOps), membawa model prediksi medis ke lingkungan produksi menghadapi sejumlah tantangan krusial: <br>1. Perlunya otomatisasi validasi data dan skema untuk mencegah *data drift* serta anomali pada data klinis baru. <br>2. Risiko disparitas prapemrosesan antara tahap pelatihan (*training*) dan inferensi (*serving*) yang memicu *training-serving skew*. <br>3. Pentingnya memastikan keadilan model (*model fairness*) agar performa prediksi tidak bias terhadap subpopulasi demografis tertentu (misalnya antarkelompok gender/jenis kelamin). <br>4. Kebutuhan arsitektur pipeline otomatis yang mampu melakukan hyperparameter tuning mandiri dan menyebarkan model yang teruji (*blessed*) ke lingkungan serving siap pakai. |
+| **Solusi machine learning** | Membangun **End-to-End Machine Learning Pipeline** berbasis framework industri **TensorFlow Extended (TFX)** yang dijalankan secara interaktif menggunakan `InteractiveContext`. Pipeline ini mengintegrasikan 10 komponen terpadu: <br>1. `CsvExampleGen`: Mengingest data CSV mentah dan membaginya ke dalam split training & evaluation berformat TFRecord standar. <br>2. `StatisticsGen`: Menghitung ringkasan statistik deskriptif data secara otomatis (TFDV). <br>3. `SchemaGen`: Menginferensikan skema, tipe data, dan domain nilai fitur. <br>4. `ExampleValidator`: Memvalidasi integritas data terhadap skema dan mendeteksi anomali. <br>5. `Transform`: Menerapkan rekayasa fitur dan penskalaan terpadu dengan TensorFlow Transform (TFT). <br>6. `Tuner`: Mengotomatisasi pencarian hyperparameter terbaik menggunakan pustaka KerasTuner (RandomSearch). <br>7. `Trainer`: Melatih Deep Neural Network (DNN) menggunakan konfigurasi hyperparameter optimal dan menyematkan graf TFT ke serving signature. <br>8. `Resolver`: Menentukan model baseline terbaik terdahulu untuk komparasi evaluasi. <br>9. `Evaluator`: Mengevaluasi metrik performa secara mendalam serta analisis slicing keadilan model (TFMA). <br>10. `Pusher`: Mendistribusikan artefak model yang telah lolos validasi (*BLESSED*) ke direktori serving siap produksi. |
+| **Metode pengolahan** | Prapemrosesan data diimplementasikan pada modul `modules/heart_disease_transform.py` menggunakan **TensorFlow Transform (TFT)** dalam fungsi `preprocessing_fn`: <br>- **Standardisasi Fitur Numerik**: Fitur kontinu (`age`, `trestbps`, `chol`, `thalach`, `oldpeak`) diskalakan ke bentuk Z-score menggunakan `tft.scale_to_z_score()` sehingga terdistribusi dengan rata-rata (*mean*) $\\approx 0$ dan varians $\\approx 1$, mencegah bias akibat perbedaan skala nilai (seperti kadar kolesterol hingga 564 mg/dl). <br>- **Transformasi Fitur Kategorikal**: Fitur diskrit (`sex`, `cp`, `fbs`, `restecg`, `exang`, `slope`, `ca`, `thal`) dikonversi secara konsisten ke tipe data `tf.int64`. <br>- **Standarisasi Label Target**: Kolom `target` diubah menjadi tipe data `tf.int64` dengan nama `target_xf`. <br>- **Eliminasi Training-Serving Skew**: Seluruh graf transformasi TFT digabungkan langsung ke dalam signature inferensi `serving_default` pada SavedModel (`_get_serve_tf_examples_fn`), sehingga model menerima data masukan mentah (`tf.train.Example`) saat inferensi dan memprosesnya dengan logika transformasi yang identik dengan fase pelatihan. |
+| **Arsitektur model** | Model Deep Neural Network (DNN) dibangun menggunakan TensorFlow Keras Functional API pada `modules/heart_disease_trainer.py` dengan konfigurasi hyperparameter optimal dari komponen `Tuner` (`pipeline_root/Tuner/best_hyperparameters/16/best_hyperparameters.txt`): <br>- **Input Layers**: Terdiri dari 5 input layer `tf.float32` untuk fitur numerik yang telah ditransformasi dan 8 input layer `tf.int64` untuk fitur kategorikal yang di-cast ke `tf.float32`. <br>- **Concatenation Layer**: Menggabungkan seluruh 13 representasi fitur menjadi satu vektor masukan terpadu. <br>- **Hidden Layer 1**: Dense layer dengan **96 unit neuron** dan fungsi aktivasi non-linear **ReLU**. <br>- **Dropout Layer 1**: Regularisasi dropout dengan rate **0.1** untuk mencegah overfitting. <br>- **Hidden Layer 2**: Dense layer dengan **16 unit neuron** dan fungsi aktivasi **ReLU**. <br>- **Dropout Layer 2**: Regularisasi dropout dengan rate **0.1**. <br>- **Output Layer**: Dense layer dengan **1 unit neuron** dan fungsi aktivasi **Sigmoid** untuk menghasilkan probabilitas prediksi risiko biner $\\hat{y} \\in [0, 1]$. <br>- **Kompilasi & Optimizer**: Dioptimasi menggunakan algoritma **Adam** dengan *learning rate* **0.01** (hasil optimal KerasTuner), loss function `binary_crossentropy`, serta metrik `binary_accuracy` dan `AUC`. |
+| **Metrik evaluasi** | Kualitas model dievaluasi secara menyeluruh menggunakan **TensorFlow Model Analysis (TFMA)** pada komponen `Evaluator`: <br>1. **BinaryAccuracy**: Mengukur proporsi ketepatan prediksi klasifikasi diagnosis secara keseluruhan terhadap label acuan. <br>2. **AUC (*Area Under ROC Curve*)**: Mengukur kemampuan diskriminasi dan separasi model dalam membedakan pasien berisiko vs pasien normal pada seluruh rentang threshold klasifikasi. <br>3. **Confusion Matrix Metrics**: Mengukur kuantitas *True Positives* (TP), *False Positives* (FP), *True Negatives* (TN), dan *False Negatives* (FN). <br>4. **Fairness Slicing Analysis**: Evaluasi slicing dilakukan terhadap keseluruhan dataset (*Overall*) serta secara spesifik pada irisan fitur jenis kelamin (`sex: 0` untuk perempuan dan `sex: 1` untuk laki-laki) guna memastikan performa model adil dan tidak mengalami bias demografis. <br>5. **Threshold Validation & Model Blessing**: Menerapkan ambang batas validasi `BinaryAccuracy` minimal $\\ge 0.50$ (`lower_bound`) dan tidak mengalami regresi performa dibanding baseline model terdahulu (`change_threshold`) agar model memperoleh predikat **BLESSED** dan disetujui untuk dipush ke lingkungan serving. |
+| **Performa model** | Hasil evaluasi resmi dari komponen `Evaluator` (diekstrak langsung menggunakan pustaka TFMA melalui `eval_result = tfma.load_eval_result(eval_uri)`): <br>- **Status Evaluator**: **BLESSED (Lolos Uji Threshold)**, model memenuhi standar kelayakan produksi. <br>- **Performa Keseluruhan (*Overall Slice*)**: <br>  • Binary Accuracy: **0.8037** (80.37%) <br>  • AUC: **0.8105** <br>  • Loss: **1.3181** <br>  • Confusion Matrix: TP = 51.0, FP = 14.0, TN = 35.0, FN = 7.0 <br>- **Hasil Slicing Pasien Perempuan (`sex: 0`)**: <br>  • Binary Accuracy: **0.9091** (90.91%) <br>  • AUC: **0.8210** <br>  • Loss: **0.7564** <br>  • Confusion Matrix: TP = 26.0, FP = 2.0, TN = 4.0, FN = 1.0 <br>- **Hasil Slicing Pasien Laki-laki (`sex: 1`)**: <br>  • Binary Accuracy: **0.7568** (75.68%) <br>  • AUC: **0.7832** <br>  • Loss: **1.5686** <br>  • Confusion Matrix: TP = 25.0, FP = 12.0, TN = 31.0, FN = 6.0 <br>Model menunjukkan performa klasifikasi yang solid dengan akurasi keseluruhan mencapai 80.37%, serta mempertahankan daya prediksi yang sangat baik pada kedua kelompok jenis kelamin. |
 
 ---
 
-## 2. Informasi tentang Persoalan yang Ingin Diselesaikan
+## Fitur Lanjutan dan Penerapan Saran Tambahan (Bintang 5)
 
-### Latar Belakang Permasalahan
-Penyakit kardiovaskular merupakan penyebab kematian nomor satu di dunia menurut *World Health Organization (WHO)*. Sebagian besar kasus penyakit jantung dapat dicegah jika risiko terdeteksi pada fase awal. Namun, metode diagnostik konvensional seringkali memerlukan rangkaian prosedur medis yang memakan waktu, biaya tinggi, serta interpretasi manual yang rentan terhadap variabilitas subjektif tenaga medis.
+Proyek ini telah mengimplementasikan seluruh kriteria saran tambahan (Bintang 5) sesuai ketentuan Dicoding:
 
-Dalam domain teknik *Machine Learning Operations (MLOps)*, terdapat tantangan kritis saat membawa model prediktif dari fase eksperimen laboratorium ke tahap produksi:
-1. **Pencegahan Anomali & Data Drift:** Data klinis pasien yang baru masuk sewaktu-waktu dapat mengalami pergeseran distribusi atau anomali tipe data yang menyebabkan penurunan performa model secara drastis (*concept drift*).
-2. **Eliminasi Training-Serving Skew:** Prapemrosesan data (seperti normalisasi) yang ditulis terpisah antara fase pelatihan (*training*) dan fase produksi (*serving/inference*) seringkali memicu disparitas komputasi (*training-serving skew*).
-3. **Keadilan dan Audit Model (Model Fairness):** Model medis wajib diuji secara objektif pada berbagai irisan demografis (misalnya kelompok gender/jenis kelamin) untuk memastikan model tidak diskriminatif atau bias terhadap subpopulasi tertentu.
+### 1. Hyperparameter Tuning Otomatis (`Tuner` + `KerasTuner`)
+- Komponen `Tuner` diintegrasikan pada pipeline menggunakan modul `modules/heart_disease_tuner.py` dengan algoritma `RandomSearch`.
+- Hyperparameter terbaik yang terpilih (`pipeline_root/Tuner/best_hyperparameters/16/best_hyperparameters.txt`):
+  ```json
+  {"units_1": 96, "units_2": 16, "dropout": 0.1, "learning_rate": 0.01}
+  ```
+- Konfigurasi ini secara otomatis diteruskan ke komponen `Trainer` melalui `hyperparameters=tuner.outputs['best_hyperparameters']`.
 
-### Pernyataan Masalah (*Problem Statements*)
-1. Bagaimana mengotomatisasi alur *ingestion*, validasi skema, perhitungan statistik, dan deteksi anomali data klinis pasien agar sistem selalu menerima data yang valid dan bersih?
-2. Bagaimana merancang arsitektur model *Deep Learning* yang dioptimasi secara otomatis menggunakan *hyperparameter tuning* guna menghasilkan akurasi prediksi risiko penyakit jantung yang tinggi dan andal?
-3. Bagaimana mengaudit keadilan model (*fairness analysis*) pada subkelompok gender dan mendistribusikan model yang lolos evaluasi (*blessed*) ke dalam infrastruktur *serving* siap produksi (*TensorFlow Serving & Docker*)?
-
----
-
-## 3. Penjelasan terkait Solusi Machine Learning yang Akan Dibuat beserta Target yang Ingin Dicapai
-
-### Solusi Machine Learning yang Diusulkan
-Solusi yang dibangun adalah **End-to-End Machine Learning Pipeline** berbasis framework industri **TensorFlow Extended (TFX)** yang dijalankan secara interaktif melalui `InteractiveContext`. Pipeline ini mencakup 10 komponen terintegrasi:
-
-```
-[ CsvExampleGen ]       -> Ingestion data CSV & pembagian split Train/Eval (TFRecord)
-       │
-[ StatisticsGen ]       -> Perhitungan ringkasan statistik deskriptif data (TFDV)
-       │
-  [ SchemaGen ]         -> Inferensi skema dan tipe data otomatis
-       │
-[ ExampleValidator ]    -> Validasi data terhadap skema & deteksi anomali/drift
-       │
-  [ Transform ]         -> Rekayasa fitur terpadu & Z-score scaling (TFT)
-       │
-    [ Tuner ]           -> (Saran 1) Hyperparameter Tuning Otomatis (KerasTuner)
-       │
-   [ Trainer ]          -> Pelatihan Deep Neural Network Keras dengan Best Hyperparameters
-       │
-   [ Resolver ]         -> Evaluasi komparatif terhadap Baseline Blessed Model
-       │
-  [ Evaluator ]         -> Evaluasi metrik & Fairness Slicing Analysis (TFMA)
-       │
-   [ Pusher ]           -> Otomasi deployment SavedModel ke direktori serving siap pakai
-```
-
-### Target yang Ingin Dicapai
-1. **Target Teknis Performa:**
-   - Model klasifikasi mencapai nilai akurasi evaluasi $\ge 80\%$ dan validation AUC $\ge 0.85$.
-   - Model menghasilkan status **BLESSED** pada komponen `Evaluator` dengan melampaui baseline performa minimum (*threshold validation*).
-   - Model terbukti adil (*fair*) tanpa bias signifikan antara kelompok pasien laki-laki (`sex = 1`) dan perempuan (`sex = 0`).
-2. **Target Operasional & Serving:**
-   - Logika transformasi fitur tertanam langsung di dalam signature inferensi SavedModel (`serving_default`) untuk mengeliminasi *training-serving skew*.
-   - Model siap dideploy menggunakan container Docker berbasis TensorFlow Serving dan mampu melayani request inferensi via REST API.
-3. **Penerapan Fitur Lanjutan Pipeline:**
-   - Mengimplementasikan komponen `Tuner` dengan pustaka `KerasTuner` (`RandomSearch`) untuk hyperparameter tuning otomatis.
-   - Menyediakan berkas `Dockerfile` deployment TensorFlow Serving beserta bukti screenshot endpoint metadata model.
-   - Menyediakan berkas notebook pengujian prediction request `rizalbasri-testing.ipynb` yang tuntas dieksekusi.
-
----
-
-## 4. Penjelasan tentang Metode Pengolahan Data, Arsitektur Model yang Digunakan, dan Metrik untuk Mengevaluasi Performa Model
-
-### 4.1 Metode Pengolahan Data (Preprocessing & Feature Engineering)
-Prapemrosesan data diimplementasikan pada modul `modules/heart_disease_transform.py` menggunakan **TensorFlow Transform (TFT)** melalui fungsi `preprocessing_fn`:
-- **Standardisasi Z-Score pada Fitur Numerik:** Fitur kontinu (`age`, `trestbps`, `chol`, `thalach`, `oldpeak`) diskalakan menggunakan fungsi `tft.scale_to_z_score()`, menghasilkan distribusi dengan rata-rata (*mean*) $\approx 0$ dan standar deviasi $\approx 1$. Hal ini mencegah fitur dengan skala besar (seperti `chol` hingga 564) mendominasi gradien bobot model.
-- **Konversi Fitur Kategorikal:** Fitur diskrit (`sex`, `cp`, `fbs`, `restecg`, `exang`, `slope`, `ca`, `thal`) dikonversi secara eksplisit ke dalam tipe data `tf.int64`.
-- **Standarisasi Label Target:** Fitur target dikonversi menjadi tipe data `tf.int64` dengan penamaan `target_xf`.
-- **Eliminasi Training-Serving Skew:** Transformasi TFT dikompilasi menjadi graf TensorFlow yang disematkan langsung ke dalam serving signature model melalui fungsi `_get_serve_tf_examples_fn`. Saat inferensi, model menerima data masukan mentah ter-serialisasi (`tf.train.Example`) dan secara otomatis menjalankan transformasi yang identik dengan proses pelatihan.
-
-### 4.2 Arsitektur Model yang Digunakan
-Model klasifikasi dibangun menggunakan **TensorFlow Keras Functional API** pada modul `modules/heart_disease_trainer.py`:
-- **Lapisan Masukan (*Input Layers*):**
-  - 5 input layer bertipe `tf.float32` untuk fitur numerik yang telah ditransformasi (`age_xf`, `trestbps_xf`, `chol_xf`, `thalach_xf`, `oldpeak_xf`).
-  - 8 input layer bertipe `tf.int64` untuk fitur kategorikal yang kemudian di-cast menjadi `tf.float32`.
-- **Lapisan Penggabungan (*Concatenation Layer*):** Seluruh representasi fitur digabungkan menjadi satu tensor vektor input terpadu (`tf.keras.layers.concatenate`).
-- **Lapisan Tersembunyi (*Hidden Layers*):**
-  - **Dense Layer 1:** Memiliki 64 unit neuron (dapat disesuaikan hingga 128 unit melalui Tuner) dengan fungsi aktivasi non-linear **ReLU** (*Rectified Linear Unit*).
-  - **Dropout Layer 1:** Dropout rate sebesar 0.2 (ruang pencarian: 0.1 – 0.3) untuk mencegah *overfitting*.
-  - **Dense Layer 2:** Memiliki 32 unit neuron (ruang pencarian: 16 – 64 unit) dengan aktivasi ReLU.
-  - **Dropout Layer 2:** Dropout rate sebesar 0.2 untuk regularisasi tambahan.
-- **Lapisan Keluaran (*Output Layer*):** Dense layer dengan 1 unit neuron dan fungsi aktivasi **Sigmoid** untuk memprediksi probabilitas keluaran biner $\hat{y} \in [0, 1]$.
-- **Kompilasi Model:**
-  - **Optimizer:** Adam dengan learning rate adaptif ($0.001$).
-  - **Loss Function:** `binary_crossentropy`.
-  - **Metrics:** `accuracy` dan `AUC` (*Area Under the ROC Curve*).
-- **Hyperparameter Tuning Otomatis (Saran 1):** Komponen `Tuner` menggunakan algoritma `keras_tuner.RandomSearch` pada modul `modules/heart_disease_tuner.py` untuk menguji kombinasi neuron layer 1, neuron layer 2, dropout rate, dan learning rate, lalu mengalirkan konfigurasi hyperparameter terbaik langsung ke komponen `Trainer`.
-
-### 4.3 Metrik untuk Mengevaluasi Performa Model
-Evaluasi performa dilakukan secara menyeluruh menggunakan **TensorFlow Model Analysis (TFMA)** pada komponen `Evaluator`:
-1. **BinaryAccuracy:** Mengukur persentase prediksi kelas risiko penyakit jantung yang benar secara keseluruhan terhadap diagnosis riil.
-2. **AUC (Area Under the ROC Curve):** Mengukur kemampuan separasi model dalam membedakan pasien yang benar-benar berisiko vs pasien yang sehat di berbagai ambang batas klasifikasi.
-3. **Confusion Matrix Metrics:** Evaluasi metrik *True Positives* (TP), *False Positives* (FP), *True Negatives* (TN), dan *False Negatives* (FN).
-4. **Fairness Slicing Specification:** Evaluasi slicing TFMA dikonfigurasi untuk mengevaluasi performa model secara agregat (*overall*) serta pada subpopulasi jenis kelamin (`sex: 0` untuk perempuan dan `sex: 1` untuk laki-laki) guna memastikan tidak terjadi bias performa antargender.
-5. **Threshold Validation & Model Blessing:** Model wajib melampaui nilai akurasi baseline minimum ($> 0.50$) dan tidak mengalami regresi performa dibanding baseline model terdahulu agar memperoleh predikat **BLESSED**.
-
----
-
-## 5. Informasi terkait Performa Model Machine Learning yang Telah Dibuat
-
-### Ringkasan Hasil Pelatihan dan Evaluasi
-Berdasarkan eksekusi pipeline TFX yang tuntas dijalankan pada notebook `notebook.ipynb`:
-
-| Parameter Evaluasi | Nilai yang Dicapai | Keterangan / Status |
-| :--- | :---: | :--- |
-| **Akurasi Pelatihan (*Train Accuracy*)** | **$pprox 88.59\%$** | Model mempelajari pola fitur klinis dengan sangat baik |
-| **Akurasi Validasi (*Validation Accuracy*)** | **$pprox 81.25\%$** | Melampaui target minimum submission ($\ge 80\%$) |
-| **Validation AUC** | **$pprox 0.8558 - 0.864$** | Kemampuan diskriminasi kelas klasifikasi sangat baik ($\ge 0.85$) |
-| **Training Loss** | **$0.3341$** | Konvergensi loss stabil dengan regularisasi dropout |
-| **Validation Loss** | **$0.4357$** | Generalisasi model baik tanpa indikasi *overfitting* berat |
-
-### Hasil Analisis Slicing (Fairness Analysis pada Atribut `sex`)
-Evaluasi TFMA menunjukkan performa yang adil dan konsisten pada setiap irisan kelompok data:
-- **Slice Keseluruhan (*Overall*):** Akurasi mencapai $pprox 81.25\%$ dengan AUC $pprox 0.86$.
-- **Slice Pasien Perempuan (`sex: 0`):** Model mencapai akurasi tinggi ($> 80\%$), membuktikan model mampu mendiagnosis pasien perempuan secara akurat.
-- **Slice Pasien Laki-laki (`sex: 1`):** Model mempertahankan akurasi stabil ($> 80\%$) dan AUC yang kuat.
-
-### Status Komponen Evaluator & Pusher
-- **Status Evaluator:** **BLESSED (Lolos Uji)**. Model berhasil melampaui seluruh ambang batas validasi metrik dan disetujui untuk tahap produksi.
-- **Hasil Pusher:** Komponen `Pusher` secara otomatis menyalin artefak SavedModel yang telah di-*bless* ke dalam direktori serving `serving_model_dir/` lengkap dengan `saved_model.pb`, direktori `variables/`, dan `assets/`.
-
----
-
-## 6. Fitur Lanjutan dan Penerapan Komponen Tambahan
-
-Proyek ini mengimplementasikan fitur-fitur lanjutan end-to-end MLOps sebagai berikut:
-
-### 6.1 Hyperparameter Tuning Otomatis (`Tuner` + `KerasTuner`)
-- Komponen `Tuner` diimplementasikan dengan modul `modules/heart_disease_tuner.py` menggunakan algoritma `kt.RandomSearch`.
-- Hyperparameter yang dioptimasi secara otomatis:
-  - `units_1`: Ukuran unit Dense layer 1 (32, 64, 96, 128)
-  - `units_2`: Ukuran unit Dense layer 2 (16, 32, 48, 64)
-  - `dropout`: Tingkat dropout rate (0.1, 0.2, 0.3)
-  - `learning_rate`: Laju pembelajaran optimizer Adam (0.01, 0.001, 0.0001)
-- Hasil konfigurasi hyperparameter terbaik (`best_hyperparameters`) dihubungkan secara otomatis ke komponen `Trainer` melalui `hyperparameters=tuner.outputs['best_hyperparameters']`.
-
-### 6.2 Model Deployment Menggunakan TensorFlow Serving & Dockerfile
-- Berkas `Dockerfile` disediakan pada direktori root proyek untuk mengemas model ke dalam container TensorFlow Serving:
+### 2. Model Deployment Menggunakan TensorFlow Serving & Dockerfile
+- Berkas `Dockerfile` disediakan pada direktori root proyek untuk mengemas model SavedModel ke dalam container TensorFlow Serving:
   ```dockerfile
   FROM tensorflow/serving:latest
   COPY ./serving_model_dir /models/heart-disease-model
   ENV MODEL_NAME=heart-disease-model
   EXPOSE 8501 8080
   ```
-- Perintah build dan menjalankan container:
+- Perintah untuk membangun image dan menjalankan container:
   ```bash
   docker build -t heart-disease-serving .
   docker run -p 8080:8501 heart-disease-serving
@@ -191,7 +45,7 @@ Proyek ini mengimplementasikan fitur-fitur lanjutan end-to-end MLOps sebagai ber
 
   ![Serving Model Metadata](serving_model_metadata.png)
 
-### 6.3 Notebook Pengujian Prediction Request (`rizalbasri-testing.ipynb`)
+### 3. Notebook Pengujian Prediction Request (`rizalbasri-testing.ipynb`)
 - Disediakan berkas notebook pengujian bernama **`rizalbasri-testing.ipynb`** sesuai ketentuan penamaan Dicoding (`<username_dicoding>-testing.ipynb`).
 - Seluruh sel dalam notebook telah dieksekusi secara lengkap tanpa kesalahan, mencakup:
   1. Pengambilan sampel observasi pasien aktual dari `data/heart.csv` (Pasien berisiko vs Pasien normal).
@@ -202,9 +56,7 @@ Proyek ini mengimplementasikan fitur-fitur lanjutan end-to-end MLOps sebagai ber
 
 ---
 
-## 7. Struktur Direktori Proyek
-
-Struktur direktori proyek `rizalbasri-pipeline` tersusun rapi sesuai standar submission Dicoding:
+## Struktur Direktori Proyek
 
 ```
 rizalbasri-pipeline/
@@ -222,12 +74,12 @@ rizalbasri-pipeline/
 ├── rizalbasri-testing.ipynb            # Notebook pengujian prediction request (Saran 3)
 ├── notebook.ipynb                      # Jupyter Notebook pipeline utama TFX (seluruh sel telah dieksekusi)
 ├── requirements.txt                    # Daftar pustaka dan dependensi proyek
-└── README.md                           # Dokumentasi komprehensif proyek
+└── README.md                           # Dokumentasi proyek sesuai template submission Dicoding
 ```
 
 ---
 
-## 8. Panduan Menjalankan Proyek
+## Panduan Menjalankan Proyek
 
 ### 1. Menyiapkan Lingkungan Virtual (Python 3.10)
 ```bash
